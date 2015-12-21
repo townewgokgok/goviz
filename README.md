@@ -40,6 +40,7 @@ Application Options:
   -s, --search=  top directory of searching
   -l, --leaf     whether leaf nodes are plotted (false)
   -m, --metrics  display module metrics (false)
+  -t, --tests    include test files (false)
 
 Help Options:
   -h, --help     Show this help message
