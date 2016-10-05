@@ -2,11 +2,12 @@ package main
 
 import (
     "fmt"
-    "github.com/hirokidaichi/goviz/dotwriter"
-    "github.com/hirokidaichi/goviz/goimport"
-    "github.com/hirokidaichi/goviz/metrics"
-    "github.com/jessevdk/go-flags"
     "os"
+
+	"github.com/jessevdk/go-flags"
+	"github.com/yuta-masano/goviz/dotwriter"
+	"github.com/yuta-masano/goviz/goimport"
+	"github.com/yuta-masano/goviz/metrics"
 )
 
 type options struct {
