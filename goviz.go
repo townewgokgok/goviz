@@ -11,14 +11,15 @@ import (
 )
 
 type options struct {
-	InputDir   string `short:"i" long:"input" required:"true" description:"input project name"`
-	OutputFile string `short:"o" long:"output" default:"STDOUT" description:"output file"`
-	Depth      int    `short:"d" long:"depth" default:"128" description:"max plot depth of the dependency tree"`
-	Reversed   string `short:"f" long:"focus" description:"focus on the specific module"`
-	SeekPath   string `short:"s" long:"search" default:"" description:"top directory of searching"`
-	PlotLeaf   bool   `short:"l" long:"leaf" description:"whether leaf nodes are plotted"`
-	UseMetrics bool   `short:"m" long:"metrics" description:"display module metrics"`
-	FilesShown int    `short:"e" long:"files-shown" default:"2147483647" description:"limit filenames displayed in a package"`
+	InputDir     string `short:"i" long:"input" required:"true" description:"input project name"`
+	OutputFile   string `short:"o" long:"output" default:"STDOUT" description:"output file"`
+	Depth        int    `short:"d" long:"depth" default:"128" description:"max plot depth of the dependency tree"`
+	Reversed     string `short:"f" long:"focus" description:"focus on the specific module"`
+	SeekPath     string `short:"s" long:"search" default:"" description:"top directory of searching"`
+	PlotLeaf     bool   `short:"l" long:"leaf" description:"whether leaf nodes are plotted"`
+	UseMetrics   bool   `short:"m" long:"metrics" description:"display module metrics"`
+	FilesShown   int    `short:"e" long:"files-shown" default:"2147483647" description:"limit filenames displayed in a package"`
+	IncludeTests bool   `short:"t" long:"tests" description:"include test files"`
 }
 
 func getOptions() (*options, error) {
@@ -48,6 +49,7 @@ func process() int {
 		options.InputDir,
 		options.SeekPath,
 		options.PlotLeaf,
+		options.IncludeTests,
 	)
 	if factory == nil {
 		errorf("inputdir does not exist.\n go get %s", options.InputDir)

@@ -41,6 +41,7 @@ Application Options:
   -l, --leaf          whether leaf nodes are plotted (false)
   -m, --metrics       display module metrics (false)
   -e, --files-shown=  limit filenames displayed in a package
+  -t, --tests         include test files (false)
 
 Help Options:
   -h, --help     Show this help message
