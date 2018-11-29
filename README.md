@@ -38,6 +38,7 @@ Application Options:
   -d, --depth=        max plot depth of the dependency tree (128)
   -f, --focus=        focus on the specific module
   -s, --search=       top directory of searching
+  -x, --exclude=      exclude filename pattern
   -l, --leaf          whether leaf nodes are plotted (false)
   -m, --metrics       display module metrics (false)
   -e, --files-shown=  limit filenames displayed in a package

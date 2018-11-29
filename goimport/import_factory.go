@@ -8,11 +8,12 @@ import (
 )
 
 func ParseRelation(
-	rootPath string, seekPath string, leafVisibility, includeTests bool) *ImportPathFactory {
+	rootPath, seekPath, excludeFile string, leafVisibility, includeTests bool) *ImportPathFactory {
 
 	factory := NewImportPathFactory(
 		rootPath,
 		seekPath,
+		excludeFile,
 		leafVisibility,
 		includeTests,
 	)
@@ -28,13 +29,18 @@ type ImportPathFactory struct {
 	Root         *ImportPath
 	Filter       *ImportFilter
 	Pool         map[string]*ImportPath
+	excludeFile  string
 	includeTests bool
 }
 
 func NewImportPathFactory(
-	rootPath string, seekPath string, leafVisibility, includeTests bool) *ImportPathFactory {
+	rootPath, seekPath, excludeFile string, leafVisibility, includeTests bool) *ImportPathFactory {
 
-	self := &ImportPathFactory{Pool: make(map[string]*ImportPath), includeTests: includeTests}
+	self := &ImportPathFactory{
+		Pool:         make(map[string]*ImportPath),
+		excludeFile:  excludeFile,
+		includeTests: includeTests,
+	}
 	filter := NewImportFilter(
 		rootPath,
 		seekPath,
@@ -87,7 +93,7 @@ func (self *ImportPathFactory) Get(importPath string) *ImportPath {
 		ImportPath: importPath,
 	}
 	pool[importPath] = ret
-	fileNames := glob(dirPath, self.includeTests)
+	fileNames := glob(dirPath, self.excludeFile, self.includeTests)
 	ret.Init(self, fileNames)
 	return ret
 }
@@ -131,7 +137,7 @@ func isMatched(pattern string, target string) bool {
 	return r.MatchString(target)
 }
 
-func glob(dirPath string,  includeTests bool) []string {
+func glob(dirPath, excludeFile string, includeTests bool) []string {
     fileNames, err := filepath.Glob(filepath.Join(dirPath, "/*.go"))
     if err != nil {
         panic("no gofiles")
@@ -145,7 +151,11 @@ func glob(dirPath string,  includeTests bool) []string {
         }
         if !includeTests && isMatched("_example[.]go", v) {
             continue
-        }
+		}
+		p := filepath.Join(dirPath, v)
+		if excludeFile != "" && isMatched(excludeFile, p) {
+			continue
+		}
         files = append(files, v)
     }
     return files

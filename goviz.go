@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"regexp"
 
 	"github.com/jessevdk/go-flags"
 	"github.com/townewgokgok/goviz/dotwriter"
@@ -16,6 +17,7 @@ type options struct {
 	Depth        int    `short:"d" long:"depth" default:"128" description:"max plot depth of the dependency tree"`
 	Reversed     string `short:"f" long:"focus" description:"focus on the specific module"`
 	SeekPath     string `short:"s" long:"search" default:"" description:"top directory of searching"`
+	ExcludeFile  string `short:"x" long:"exclude" description:"exclude filename pattern"`
 	PlotLeaf     bool   `short:"l" long:"leaf" description:"whether leaf nodes are plotted"`
 	UseMetrics   bool   `short:"m" long:"metrics" description:"display module metrics"`
 	FilesShown   int    `short:"e" long:"files-shown" default:"2147483647" description:"limit filenames displayed in a package"`
@@ -48,6 +50,7 @@ func process() int {
 	factory := goimport.ParseRelation(
 		options.InputDir,
 		options.SeekPath,
+		options.ExcludeFile,
 		options.PlotLeaf,
 		options.IncludeTests,
 	)
@@ -67,6 +70,12 @@ func process() int {
 	if 0 > options.FilesShown {
 		errorf("-e or --files-shown should have positive int\n")
 		return 1
+	}
+	if options.ExcludeFile != "" {
+		if _, err := regexp.Compile(options.ExcludeFile); err != nil {
+			errorf("-x or --exclude should have valid regexp\n")
+			return 1
+		}
 	}
 	output := getOutputWriter(options.OutputFile)
 	if options.UseMetrics {
