@@ -73,6 +73,7 @@ func process() int {
 		return 0
 	}
 
+	dotwriter.SeekPath = options.SeekPath
 	dotwriter.FilesShown = options.FilesShown
 	writer := dotwriter.New(output)
 	writer.MaxDepth = options.Depth

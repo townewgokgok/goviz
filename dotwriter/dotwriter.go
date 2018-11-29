@@ -6,11 +6,14 @@ import (
     "strconv"
 )
 
-var FilesShown int
+var (
+    SeekPath string
+    FilesShown int
+)
 
 type IDotNode interface {
     Name() string
-    Label(int) string
+    Label(string, int) string
     Shape() string
     Style() string
     Children() []IDotNode
@@ -105,7 +108,7 @@ func (dw *DotWriter) plotNodeStyle(node IDotNode) {
     dw.printFormat("\t%s[shape=%s,label=\"%s\",style=%s]\n",
         escape(node.Name()),
         escape(node.Shape()),
-        node.Label(FilesShown),
+        node.Label(SeekPath, FilesShown),
         escape(node.Style()),
     )
 }

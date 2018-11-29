@@ -58,18 +58,24 @@ func (self *ImportPath) AddParent(parent dotwriter.IDotNode) {
 	self.parents = append(self.parents, parent)
 }
 
-func (self *ImportPath) Label(limit int) string {
-	if !self.HasFiles() {
-		return self.ImportPath
+func (self *ImportPath) Label(seekPath string, limit int) string {
+	if 0 < len(seekPath) && seekPath[len(seekPath)-1] == '/' {
+		seekPath = seekPath[:len(seekPath)-1]
 	}
-	if limit == 0 {
-		return fmt.Sprintf("%s|%s",
-			self.Files[0].Namespace,
-			self.ImportPath)
+	importPath := self.ImportPath
+	if seekPath != "" {
+		if importPath == seekPath {
+			importPath = "(root)"
+		} else if strings.HasPrefix(importPath, seekPath+"/") {
+			importPath = importPath[len(seekPath)+1:]
+		}
 	}
-	return fmt.Sprintf("%s|%s|%s",
+	if !self.HasFiles() || limit == 0 {
+		return importPath
+	}
+	return fmt.Sprintf("%d|%s|%s",
 		self.Files[0].Namespace,
-		self.ImportPath,
+		importPath,
 		strings.Join(self.FileNames(limit), `\n`))
 }
 
