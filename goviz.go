@@ -5,9 +5,9 @@ import (
 	"os"
 
 	"github.com/jessevdk/go-flags"
-	"github.com/yuta-masano/goviz/dotwriter"
-	"github.com/yuta-masano/goviz/goimport"
-	"github.com/yuta-masano/goviz/metrics"
+	"github.com/townewgokgok/goviz/dotwriter"
+	"github.com/townewgokgok/goviz/goimport"
+	"github.com/townewgokgok/goviz/metrics"
 )
 
 type options struct {
