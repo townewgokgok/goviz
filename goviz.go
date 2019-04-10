@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"regexp"
+	"strings"
 
 	"github.com/jessevdk/go-flags"
 	"github.com/townewgokgok/goviz/dotwriter"
@@ -47,6 +49,10 @@ func process() int {
 	if err != nil {
 		return 1
 	}
+
+	options.InputDir = packageFromPath(options.InputDir)
+	options.SeekPath = packageFromPath(options.SeekPath)
+
 	factory := goimport.ParseRelation(
 		options.InputDir,
 		options.SeekPath,
@@ -125,4 +131,17 @@ func getOutputWriter(name string) *os.File {
 	}
 	f, _ := os.Create(name)
 	return f
+}
+
+func packageFromPath(path string) string {
+	if !(strings.HasPrefix(path, "/") || strings.HasPrefix(path, ".")) {
+		return path
+	}
+	cmd := exec.Command("go", "list", path)
+	cmd.Stderr = os.Stderr
+	out, err := cmd.Output()
+	if err != nil {
+		return path
+	}
+	return strings.TrimSpace(string(out))
 }

@@ -12,8 +12,6 @@ import (
 func ParseRelation(
 	rootPath, seekPath, excludeFile string, leafVisibility, includeTests bool) *ImportPathFactory {
 
-	rootPath = packageFromPath(rootPath)
-	seekPath = packageFromPath(seekPath)
 	factory := NewImportPathFactory(
 		rootPath,
 		seekPath,
@@ -191,14 +189,4 @@ func goSrc(importPath string) (string, error) {
 	result := strings.TrimSpace(string(out))
 	goSrcResult[importPath] = result
 	return result, nil
-}
-
-func packageFromPath(path string) string {
-	cmd := exec.Command("go", "list", path)
-	cmd.Stderr = os.Stderr
-	out, err := cmd.Output()
-	if err != nil {
-		return path
-	}
-	return strings.TrimSpace(string(out))
 }

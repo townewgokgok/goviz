@@ -66,7 +66,7 @@ func (self *ImportPath) Label(seekPath string, limit int) string {
 	if seekPath != "" {
 		if importPath == seekPath {
 			importPath = "(root)"
-		} else if strings.HasPrefix(importPath, seekPath+"/") {
+		} else if strings.HasPrefix(importPath+"/", seekPath+"/") {
 			importPath = importPath[len(seekPath)+1:]
 		}
 	}
