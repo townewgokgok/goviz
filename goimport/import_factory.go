@@ -1,7 +1,9 @@
 package goimport
 
 import (
+	"errors"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -10,6 +12,8 @@ import (
 func ParseRelation(
 	rootPath, seekPath, excludeFile string, leafVisibility, includeTests bool) *ImportPathFactory {
 
+	rootPath = packageFromPath(rootPath)
+	seekPath = packageFromPath(seekPath)
 	factory := NewImportPathFactory(
 		rootPath,
 		seekPath,
@@ -36,6 +40,9 @@ type ImportPathFactory struct {
 func NewImportPathFactory(
 	rootPath, seekPath, excludeFile string, leafVisibility, includeTests bool) *ImportPathFactory {
 
+	if rootPath == "." {
+
+	}
 	self := &ImportPathFactory{
 		Pool:         make(map[string]*ImportPath),
 		excludeFile:  excludeFile,
@@ -79,8 +86,8 @@ func (self *ImportPathFactory) Get(importPath string) *ImportPath {
 		return pool[importPath]
 	}
 
-	dirPath := filepath.Join(goSrc(), importPath)
-	if !fileExists(dirPath) {
+	dirPath, err := goSrc(importPath)
+	if err != nil {
 		// if invisible return nil
 		if !filter.Visible(importPath) {
 			return nil
@@ -138,29 +145,60 @@ func isMatched(pattern string, target string) bool {
 }
 
 func glob(dirPath, excludeFile string, includeTests bool) []string {
-    fileNames, err := filepath.Glob(filepath.Join(dirPath, "/*.go"))
-    if err != nil {
-        panic("no gofiles")
-    }
+	fileNames, err := filepath.Glob(filepath.Join(dirPath, "/*.go"))
+	if err != nil {
+		panic("no gofiles")
+	}
 
-    files := make([]string, 0, len(fileNames))
+	files := make([]string, 0, len(fileNames))
 
-    for _, v := range fileNames {
-        if !includeTests && isMatched("_test[.]go", v) {
-            continue
-        }
-        if !includeTests && isMatched("_example[.]go", v) {
-            continue
+	for _, v := range fileNames {
+		if !includeTests && isMatched("_test[.]go", v) {
+			continue
+		}
+		if !includeTests && isMatched("_example[.]go", v) {
+			continue
 		}
 		p := filepath.Join(dirPath, v)
 		if excludeFile != "" && isMatched(excludeFile, p) {
 			continue
 		}
-        files = append(files, v)
-    }
-    return files
+		files = append(files, v)
+	}
+	return files
 }
 
-func goSrc() string {
-	return filepath.Join(os.Getenv("GOPATH"), "src")
+var errBuiltin = errors.New("Built-in package")
+var goSrcResult = map[string]string{}
+var goSrcError = map[string]error{
+	"C": errBuiltin,
+}
+
+func goSrc(importPath string) (string, error) {
+	if result, ok := goSrcResult[importPath]; ok {
+		return result, nil
+	}
+	if err, ok := goSrcError[importPath]; ok {
+		return "", err
+	}
+	cmd := exec.Command("go", "list", "-f", "{{.Dir}}", importPath)
+	cmd.Stderr = os.Stderr
+	out, err := cmd.Output()
+	if err != nil {
+		goSrcError[importPath] = err
+		return "", err
+	}
+	result := strings.TrimSpace(string(out))
+	goSrcResult[importPath] = result
+	return result, nil
+}
+
+func packageFromPath(path string) string {
+	cmd := exec.Command("go", "list", path)
+	cmd.Stderr = os.Stderr
+	out, err := cmd.Output()
+	if err != nil {
+		return path
+	}
+	return strings.TrimSpace(string(out))
 }

@@ -73,7 +73,7 @@ func (self *ImportPath) Label(seekPath string, limit int) string {
 	if !self.HasFiles() || limit == 0 {
 		return importPath
 	}
-	return fmt.Sprintf("%d|%s|%s",
+	return fmt.Sprintf("%s|%s|%s",
 		self.Files[0].Namespace,
 		importPath,
 		strings.Join(self.FileNames(limit), `\n`))
