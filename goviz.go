@@ -17,6 +17,7 @@ type options struct {
 	InputDir     string `short:"i" long:"input" required:"true" description:"input project name"`
 	OutputFile   string `short:"o" long:"output" default:"STDOUT" description:"output file"`
 	Depth        int    `short:"d" long:"depth" default:"128" description:"max plot depth of the dependency tree"`
+	HideNoFiles  bool   `short:"n" long:"hide-no-files" description:"hide packages with no files"`
 	Reversed     string `short:"f" long:"focus" description:"focus on the specific module"`
 	SeekPath     string `short:"s" long:"search" default:"" description:"top directory of searching"`
 	ExcludeFile  string `short:"x" long:"exclude" description:"exclude filename pattern"`
@@ -94,6 +95,7 @@ func process() int {
 	dotwriter.FilesShown = options.FilesShown
 	writer := dotwriter.New(output)
 	writer.MaxDepth = options.Depth
+	writer.HideNoFiles = options.HideNoFiles
 	if options.Reversed == "" {
 		writer.PlotGraph(root)
 		return 0
